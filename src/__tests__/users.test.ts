@@ -1,6 +1,7 @@
 import request from 'supertest';
 import { readFileSync } from 'fs';
 import { join } from 'path';
+import jwt from 'jsonwebtoken';
 import pool from '../db';
 import app from '../app';
 
@@ -86,5 +87,70 @@ describe('POST /users', () => {
 
     expect(res.status).toBe(400);
     expect(res.body).toEqual({ error: 'password must be at least 8 characters' });
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('POST /auth/login', () => {
+  const credentials = { email: 'alice@example.com', password: 'password123' };
+
+  beforeEach(async () => {
+    await request(app).post('/users').send({
+      ...credentials,
+      full_name: 'Alice Nguyen',
+    });
+  });
+
+  it('200 — correct credentials return token and user, JWT has userId + role, expires in 24h', async () => {
+    const res = await request(app).post('/auth/login').send(credentials);
+
+    expect(res.status).toBe(200);
+    expect(res.body.token).toBeDefined();
+    expect(res.body.user).toMatchObject({ email: credentials.email, role: 'member' });
+    expect(res.body.user.id).toBeDefined();
+
+    const payload = jwt.decode(res.body.token) as jwt.JwtPayload;
+    expect(payload.userId).toBeDefined();
+    expect(payload.role).toBe('member');
+
+    const expiresIn = payload.exp! - payload.iat!;
+    expect(expiresIn).toBe(24 * 60 * 60);
+  });
+
+  it('401 — wrong password returns Invalid credentials', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: credentials.email, password: 'wrongpassword' });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ error: 'Invalid credentials' });
+  });
+
+  it('401 — unknown email returns same message as wrong password', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: 'nobody@example.com', password: 'password123' });
+
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ error: 'Invalid credentials' });
+  });
+
+  it('400 — missing email', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ password: 'password123' });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'email and password are required' });
+  });
+
+  it('400 — missing password', async () => {
+    const res = await request(app)
+      .post('/auth/login')
+      .send({ email: credentials.email });
+
+    expect(res.status).toBe(400);
+    expect(res.body).toEqual({ error: 'email and password are required' });
   });
 });
