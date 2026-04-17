@@ -102,7 +102,7 @@ describe('POST /auth/login', () => {
     });
   });
 
-  it('200 — correct credentials return token and user, JWT has userId + role, expires in 24h', async () => {
+  it('200 — correct credentials return token and user, JWT has sub + role, expires in 24h', async () => {
     const res = await request(app).post('/auth/login').send(credentials);
 
     expect(res.status).toBe(200);
@@ -111,7 +111,7 @@ describe('POST /auth/login', () => {
     expect(res.body.user.id).toBeDefined();
 
     const payload = jwt.decode(res.body.token) as jwt.JwtPayload;
-    expect(payload.userId).toBeDefined();
+    expect(payload.sub).toBeDefined();
     expect(payload.role).toBe('member');
 
     const expiresIn = payload.exp! - payload.iat!;
