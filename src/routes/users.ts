@@ -53,12 +53,13 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json(result.rows[0]);
   } catch (err: unknown) {
-    const pgErr = err as { code?: string };
+    const pgErr = err as { code?: string; message?: string };
     if (pgErr.code === '23505') {
       res.status(409).json({ error: 'Email already in use' });
       return;
     }
-    throw err;
+    console.error('Registration error:', pgErr);  // Add logging
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 
