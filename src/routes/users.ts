@@ -40,7 +40,8 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   const normalizedEmail = email.trim().toLowerCase();
   const trimmedName = full_name.trim();
 
-  const password_hash = await bcrypt.hash(password, 12);
+  const rounds = parseInt(process.env.BCRYPT_ROUNDS ?? '12', 10);
+  const password_hash = await bcrypt.hash(password, rounds);
 
   try {
     const result = await pool.query(
