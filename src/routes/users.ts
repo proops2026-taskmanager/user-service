@@ -63,4 +63,25 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
   }
 });
 
+// GET /users/:id — Return user by ID (no password_hash)
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      'SELECT id, email, full_name, role, created_at FROM users WHERE id = $1',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'user not found' });
+      return;
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
 export default router;
