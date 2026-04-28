@@ -14,7 +14,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
   }
 
   const result = await pool.query(
-    'SELECT id, email, password_hash, role FROM users WHERE email = $1',
+    'SELECT id, email, full_name, password_hash, role FROM users WHERE email = $1',
     [email.trim().toLowerCase()]
   );
 
@@ -35,7 +35,7 @@ router.post('/login', async (req: Request, res: Response): Promise<void> => {
 
   res.status(200).json({
     token,
-    user: { id: user.id, email: user.email, role: user.role },
+    user: { id: user.id, email: user.email, full_name: user.full_name, role: user.role },
   });
 });
 

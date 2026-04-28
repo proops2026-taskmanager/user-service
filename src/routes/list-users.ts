@@ -4,13 +4,12 @@ import pool from '../db';
 const router = Router();
 
 // GET /users — List all users (for assignment dropdown)
-// Accessible by authenticated leads only
+// Accessible by any authenticated user (api-gateway injects X-User-Id)
 router.get('/', async (req: Request, res: Response): Promise<void> => {
-  const userRole = req.headers['x-user-role'] as string | undefined;
+  const userId = req.headers['x-user-id'] as string | undefined;
 
-  // Only leads can list all users (for task assignment)
-  if (userRole !== 'lead') {
-    res.status(403).json({ error: 'forbidden' });
+  if (!userId) {
+    res.status(401).json({ error: 'unauthorized' });
     return;
   }
 
