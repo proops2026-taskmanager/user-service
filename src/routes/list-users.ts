@@ -3,13 +3,13 @@ import pool from '../db';
 
 const router = Router();
 
-// GET /users — List all users (for assignment dropdown)
-// Accessible by any authenticated user (api-gateway injects X-User-Id)
+// GET /users — List all users (lead role only)
+// api-gateway injects X-User-Role after JWT validation
 router.get('/', async (req: Request, res: Response): Promise<void> => {
-  const userId = req.headers['x-user-id'] as string | undefined;
+  const role = req.headers['x-user-role'] as string | undefined;
 
-  if (!userId) {
-    res.status(401).json({ error: 'unauthorized' });
+  if (role !== 'lead') {
+    res.status(403).json({ error: 'forbidden' });
     return;
   }
 
