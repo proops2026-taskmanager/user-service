@@ -40,5 +40,6 @@ jobs:
       - name: Verify Docker secret loaded
         env:
           DOCKERHUB_TOKEN: ${{ secrets.DOCKERHUB_TOKEN }}
-        run: echo "Token length: ${#DOCKERHUB_TOKEN}"
+          run: |
+            echo "Token length: ${#DOCKERHUB_TOKEN}"
 
