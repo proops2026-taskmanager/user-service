@@ -1,0 +1,39 @@
+name: CI
+on: [push, pull_request]
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+
+    services:
+      postgres:
+        image: postgres:15
+        env:
+          POSTGRES_USER: app_user
+          POSTGRES_PASSWORD: app_pass
+          POSTGRES_DB: users_test_db
+        ports:
+          - 5433:5432
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'
+
+      - name: Create test env
+        run: |
+          echo "DATABASE_URL=postgresql://app_user:app_pass@localhost:5433/users_test_db" >> .env.test
+          echo "JWT_SECRET=test_secret_minimum_32_characters_long" >> .env.test
+          echo "JWT_EXPIRES_IN=24h" >> .env.test
+          echo "PORT=3001" >> .env.test
+
+      - run: npm ci
+      - run: npm test
