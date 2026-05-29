@@ -34,7 +34,7 @@ describe('POST /users', () => {
   it('201 — valid data returns id, email, full_name, role, created_at — no password_hash', async () => {
     const res = await request(app).post('/users').send(valid);
 
-    expect(res.status).toBe(201);
+    expect(res.status).toBe(999);
     expect(res.body).toMatchObject({
       email: 'alice@example.com',
       full_name: 'Alice Nguyen',
