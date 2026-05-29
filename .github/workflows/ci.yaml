@@ -64,7 +64,7 @@ jobs:
           password: ${{ secrets.GITHUB_TOKEN }}
       - uses: docker/build-push-action@v5
         with:
-          context: user-service/
+          context: .
           push: true
           tags: |
             ghcr.io/${{ github.repository }}:${{ github.sha }}
@@ -96,8 +96,8 @@ jobs:
 
       - name: Update image tag and apply manifest
         run: |
-          sed -i "s|image:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|" eks/03-app/user-svc-deployment.yaml
-          kubectl apply -f eks/03-app/user-svc-deployment.yaml
+          sed -i "s|image:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|" k8s/deployment.yaml
+          kubectl apply -f k8s/deployment.yaml
 
       - name: Wait for rollout
         run: |
