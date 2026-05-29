@@ -94,6 +94,13 @@ jobs:
             --from-literal=BCRYPT_ROUNDS=10 \
             --from-literal=JWT_EXPIRES_IN=24h
 
+      - name: Create GHCR pull secret
+        run: |
+          kubectl create secret docker-registry ghcr-pull-secret \
+            --docker-server=ghcr.io \
+            --docker-username=${{ github.actor }} \
+            --docker-password=${{ secrets.GITHUB_TOKEN }}
+
       - name: Update image tag and apply manifest
         run: |
           sed -i "s|image:.*|image: ghcr.io/${{ github.repository }}:${{ github.sha }}|" k8s/deployment.yaml
