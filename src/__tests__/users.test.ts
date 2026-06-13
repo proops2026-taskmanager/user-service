@@ -128,7 +128,9 @@ describe('GET /users/:id — T-05', () => {
 
 // ---------------------------------------------------------------------------
 
-describe('GET /users — list all users (lead only)', () => {
+describe('GET /users — list all users (any authenticated user)', () => {
+  const USER_ID = '11111111-1111-1111-1111-111111111111';
+
   beforeEach(async () => {
     await request(app).post('/users').send({ email: 'alice@example.com', password: 'password123', full_name: 'Alice Nguyen' });
     await request(app).post('/users').send({ email: 'bob@example.com', password: 'password123', full_name: 'Bob Tran' });
@@ -137,6 +139,7 @@ describe('GET /users — list all users (lead only)', () => {
   it('200 — lead gets list of all users', async () => {
     const res = await request(app)
       .get('/users')
+      .set('X-User-Id', USER_ID)
       .set('X-User-Role', 'lead');
 
     expect(res.status).toBe(200);
@@ -144,19 +147,21 @@ describe('GET /users — list all users (lead only)', () => {
     expect(res.body.users[0].password_hash).toBeUndefined();
   });
 
-  it('403 — member cannot list all users', async () => {
+  it('200 — member can also list users (for assignee dropdown)', async () => {
     const res = await request(app)
       .get('/users')
+      .set('X-User-Id', USER_ID)
       .set('X-User-Role', 'member');
 
-    expect(res.status).toBe(403);
-    expect(res.body).toEqual({ error: 'forbidden' });
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(2);
   });
 
-  it('403 — no role header is rejected', async () => {
+  it('401 — no X-User-Id is rejected', async () => {
     const res = await request(app).get('/users');
 
-    expect(res.status).toBe(403);
+    expect(res.status).toBe(401);
+    expect(res.body).toEqual({ error: 'unauthorized' });
   });
 });
 
