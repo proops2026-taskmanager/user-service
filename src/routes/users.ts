@@ -7,7 +7,8 @@ const router = Router();
 const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 router.post('/', async (req: Request, res: Response): Promise<void> => {
-  const { email, password, full_name, role } = req.body;
+  const { email, password, full_name: full_name_raw, name, role } = req.body;
+  const full_name = full_name_raw ?? name;
 
   if (!email) {
     res.status(400).json({ error: 'email is required' });
