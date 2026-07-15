@@ -1,0 +1,18 @@
+name: PR Open — App CI
+on:
+  pull_request:
+    paths-ignore:
+      - 'iac/**'
+      - '**/Jenkinsfile'
+    branches: [main]
+    types: [opened, synchronize]
+
+jobs:
+  app-ci:
+    uses: proops2026-taskmanager/proops2026-cicd-platform/.github/workflows/reusable-app-ci.yml@v1
+    with:
+      runtime-version: "20"
+      project-name: "proops2026"
+      service-name: "user-service"
+      image-tag: ${{ github.sha }}
+      push-image: false                # PR open = build, don't push
