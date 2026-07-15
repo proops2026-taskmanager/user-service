@@ -21,12 +21,9 @@
   "jest": {
     "preset": "ts-jest",
     "testEnvironment": "node",
-    "setupFiles": [
-      "dotenv/config"
-    ],
-    "testMatch": [
-      "**/__tests__/**/*.test.ts"
-    ]
+    "setupFiles": ["dotenv/config"],
+    "testMatch": ["**/__tests__/**/*.test.ts"],
+    "coverageReporters": ["lcov"]
   },
   "devDependencies": {
     "@types/bcryptjs": "^2.4.6",

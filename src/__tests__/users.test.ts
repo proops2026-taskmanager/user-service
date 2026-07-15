@@ -92,6 +92,76 @@ describe('POST /users', () => {
 
 // ---------------------------------------------------------------------------
 
+describe('GET /users/:id — T-05', () => {
+  let userId: string;
+
+  beforeEach(async () => {
+    const res = await request(app).post('/users').send({
+      email: 'alice@example.com',
+      password: 'password123',
+      full_name: 'Alice Nguyen',
+    });
+    userId = res.body.id;
+  });
+
+  it('200 — returns user without password_hash', async () => {
+    const res = await request(app).get(`/users/${userId}`);
+
+    expect(res.status).toBe(200);
+    expect(res.body).toMatchObject({
+      id: userId,
+      email: 'alice@example.com',
+      full_name: 'Alice Nguyen',
+      role: 'member',
+    });
+    expect(res.body.created_at).toBeDefined();
+    expect(res.body.password_hash).toBeUndefined();
+  });
+
+  it('404 — unknown id returns user not found', async () => {
+    const res = await request(app).get('/users/00000000-0000-0000-0000-000000000000');
+
+    expect(res.status).toBe(404);
+    expect(res.body).toEqual({ error: 'user not found' });
+  });
+});
+
+// ---------------------------------------------------------------------------
+
+describe('GET /users — list all users (lead only)', () => {
+  beforeEach(async () => {
+    await request(app).post('/users').send({ email: 'alice@example.com', password: 'password123', full_name: 'Alice Nguyen' });
+    await request(app).post('/users').send({ email: 'bob@example.com', password: 'password123', full_name: 'Bob Tran' });
+  });
+
+  it('200 — lead gets list of all users', async () => {
+    const res = await request(app)
+      .get('/users')
+      .set('X-User-Role', 'lead');
+
+    expect(res.status).toBe(200);
+    expect(res.body.users).toHaveLength(2);
+    expect(res.body.users[0].password_hash).toBeUndefined();
+  });
+
+  it('403 — member cannot list all users', async () => {
+    const res = await request(app)
+      .get('/users')
+      .set('X-User-Role', 'member');
+
+    expect(res.status).toBe(403);
+    expect(res.body).toEqual({ error: 'forbidden' });
+  });
+
+  it('403 — no role header is rejected', async () => {
+    const res = await request(app).get('/users');
+
+    expect(res.status).toBe(403);
+  });
+});
+
+// ---------------------------------------------------------------------------
+
 describe('POST /auth/login', () => {
   const credentials = { email: 'alice@example.com', password: 'password123' };
 

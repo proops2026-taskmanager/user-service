@@ -53,12 +53,34 @@ router.post('/', async (req: Request, res: Response): Promise<void> => {
 
     res.status(201).json(result.rows[0]);
   } catch (err: unknown) {
-    const pgErr = err as { code?: string };
+    const pgErr = err as { code?: string; message?: string };
     if (pgErr.code === '23505') {
       res.status(409).json({ error: 'Email already in use' });
       return;
     }
-    throw err;
+    console.error('Registration error:', pgErr);  // Add logging
+    res.status(500).json({ error: 'Internal server error' });
+  }
+});
+
+// GET /users/:id — Return user by ID (no password_hash)
+router.get('/:id', async (req: Request, res: Response): Promise<void> => {
+  const { id } = req.params;
+
+  try {
+    const result = await pool.query(
+      'SELECT id, email, full_name, role, created_at FROM users WHERE id = $1',
+      [id]
+    );
+
+    if (result.rows.length === 0) {
+      res.status(404).json({ error: 'user not found' });
+      return;
+    }
+
+    res.status(200).json(result.rows[0]);
+  } catch {
+    res.status(500).json({ error: 'Internal server error' });
   }
 });
 

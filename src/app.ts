@@ -2,6 +2,7 @@ import express from 'express';
 import morgan from 'morgan';
 import usersRouter from './routes/users';
 import authRouter from './routes/auth';
+import listUsersRouter from './routes/list-users';
 
 const app = express();
 
@@ -14,5 +15,6 @@ app.get('/health', (_req, res) => {
 
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
+app.use('/users', listUsersRouter);
 
 export default app;
