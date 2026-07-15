@@ -15,7 +15,3 @@ jobs:
       service-name: "user-service"
       image-tag: ${{ github.sha }}
       push-image: true                 # main = push
-    secrets:
-      # REGISTRY_USERNAME and REGISTRY_TOKEN auto-fall-back to GITHUB_TOKEN
-      # if you're using GHCR (the default registry). Add explicit secrets here
-      # if pushing to Docker Hub or another registry.
