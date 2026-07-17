@@ -19,5 +19,3 @@ jobs:
       service-name: "user-service"
       image-tag: ${{ github.sha }}
       push-image: true                 # main = push
-    secrets:
-      REGISTRY_TOKEN: ${{ secrets.GITHUB_TOKEN }}
