@@ -5,6 +5,10 @@ on:
     paths-ignore:
       - 'iac/**'
       - '**/Jenkinsfile'
+      
+permissions:
+  contents: read
+  packages: write
 
 jobs:
   app-ci:
