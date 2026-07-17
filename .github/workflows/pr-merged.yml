@@ -19,3 +19,5 @@ jobs:
       service-name: "user-service"
       image-tag: ${{ github.sha }}
       push-image: true                 # main = push
+    secrets:
+      GHCR_TOKEN: ${{ secrets.GHCR_TOKEN }}
