@@ -16,3 +16,5 @@ jobs:
       service-name: "user-service"
       image-tag: ${{ github.sha }}
       push-image: false                # PR open = build, don't push
+    secrets:
+      SONAR_TOKEN: ${{ secrets.SONAR_TOKEN }}
