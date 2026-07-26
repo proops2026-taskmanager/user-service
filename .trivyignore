@@ -1,0 +1,3 @@
+# Trivy SCA exceptions for user-service.
+# Only list a CVE here with a reason + review date — never blanket-suppress.
+# Format: CVE-ID  # reason, review-by YYYY-MM-DD
