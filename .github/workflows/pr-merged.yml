@@ -40,3 +40,14 @@ jobs:
       service-name: "user-service"
     secrets:
       GHCR_PAT: ${{ secrets.GHCR_PAT }}
+
+  deploy-prod:
+    needs: [build, deploy-staging]   # gated by staging — same image-tag, no rebuild
+    uses: proops2026-taskmanager/proops2026-cicd-platform/.github/workflows/reusable-deploy.yml@v2
+    with:
+      image-tag: ${{ needs.build.outputs.image-tag }}
+      environment: prod   # required reviewers on this GitHub Environment pause the run for approval
+      project-name: "proops2026-taskmanager"
+      service-name: "user-service"
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
