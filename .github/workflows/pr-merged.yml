@@ -28,4 +28,15 @@ jobs:
       project-name: "proops2026-taskmanager"
       service-name: "user-service"
     secrets:
-      GHCR_PAT: ${{ secrets.GHCR_PAT }} 
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
+
+  deploy-staging:
+    needs: [build, deploy-dev]   # gated by dev — same image-tag, no rebuild
+    uses: proops2026-taskmanager/proops2026-cicd-platform/.github/workflows/reusable-deploy.yml@v2
+    with:
+      image-tag: ${{ needs.build.outputs.image-tag }}
+      environment: staging
+      project-name: "proops2026-taskmanager"
+      service-name: "user-service"
+    secrets:
+      GHCR_PAT: ${{ secrets.GHCR_PAT }}
