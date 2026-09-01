@@ -34,12 +34,6 @@ app.get('/metrics', async (_req, res) => {
   res.end(await register.metrics());
 });
 
-// TEMPORARY — Day 31 Q5 "break it" exercise, proves the Errors panel picks up
-// a real 500. Remove once the induced-failure screenshot is captured.
-app.get('/debug/fail', (_req, res) => {
-  res.status(500).json({ error: 'induced failure for RED dashboard verification' });
-});
-
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/users', listUsersRouter);
