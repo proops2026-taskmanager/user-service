@@ -34,13 +34,6 @@ app.get('/metrics', async (_req, res) => {
   res.end(await register.metrics());
 });
 
-// TEMPORARY — Day 31 Q6, re-triggering a failure after the EC2 reboot cleared
-// the previous one. Remove once the Errors + Logs panels are re-verified.
-app.get('/debug/fail', (_req, res) => {
-  console.error('Induced failure for RED dashboard verification (Q6 logs check)');
-  res.status(500).json({ error: 'induced failure for RED dashboard verification' });
-});
-
 app.use('/users', usersRouter);
 app.use('/auth', authRouter);
 app.use('/users', listUsersRouter);
